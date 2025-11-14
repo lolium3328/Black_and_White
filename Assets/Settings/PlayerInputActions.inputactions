@@ -18,7 +18,7 @@
                     "name": "Attack",
                     "type": "Value",
                     "id": "3bbc23d0-83ff-476b-b0c2-2b9c91a464b5",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -46,6 +46,15 @@
                     "type": "Value",
                     "id": "ba8faa17-318c-43c2-aeff-2bffcd91acb5",
                     "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "MousePosition",
+                    "type": "Value",
+                    "id": "fe4962cd-16ad-4d50-9b60-76372616c697",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -120,17 +129,6 @@
                 },
                 {
                     "name": "",
-                    "id": "f5388456-0854-413f-aaa3-a961a30537b3",
-                    "path": "<Mouse>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "a134113d-cd5a-4c74-8031-1383ec5f3b41",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -159,6 +157,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "SwitchColor",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37a5a093-3c36-4ab8-b4a7-1ace0a6ad76d",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MousePosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
