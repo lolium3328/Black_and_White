@@ -1,29 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LightBallSpawnerScript : MonoBehaviour
 {
     [SerializeField] GameObject LightBall;
-    [SerializeField] float spawnRate = 2;
+    [SerializeField] float spawnRate = 1f;    //长按开始施法，每隔spawnRate秒生成一个光球
     private float timer = 0;
-    [SerializeField] float widthOffset = 2;
+    [SerializeField] float widthOffset = 0.5f; //生成光球的范围偏移量
+    private bool isAttacking = false;
 
-    private void Start()
+    private void Awake()
     {
-        SpawnLightBall();
+        var actions = InputManager.Instance.PlayerInputActions;
+        actions.Player.Attack.performed += ctx =>
+        {
+            isAttacking = true;
+        };
+        actions.Player.Attack.canceled += ctx =>
+        {
+            isAttacking = false;
+        };
     }
 
     void Update()
     {
-        if (timer < spawnRate)
-        {
-            timer = timer + Time.deltaTime;
+        if (isAttacking){
+            if (timer < spawnRate)
+            {
+                timer = timer + Time.deltaTime;
+            }
+            else
+            {
+                SpawnLightBall();
+                timer = 0;
+            }
         }
-        else
-        {
-            SpawnLightBall();
-        }
+        
     }
     void SpawnLightBall()
     {

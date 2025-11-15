@@ -1,34 +1,47 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class ScytheScript : MonoBehaviour
 {
     [SerializeField] GameObject Player;
     [SerializeField] GameObject AimPoint;
-    [SerializeField] float rotationSpeed = 360f; // 每秒最大旋转角度（度/秒）
+    [SerializeField] float rotationSpeed = 360f;
     public GameObject Blade;
     private bool isWaiting = false;
+    private System.Action<InputAction.CallbackContext> attackCallback;
+    private PlayerControl playerControl; // 改为局部字段
 
     private void Awake()
     {
-        // 使用全局 InputManager 实例
-        var actions = InputManager.Instance.PlayerInputActions;
-        actions.Player.Attack.performed += ctx =>
+        // 从 Player 物体上获取 PlayerControl 脚本
+        playerControl = Player?.GetComponent<PlayerControl>();
+        if (playerControl == null)
         {
-            if (isWaiting) return;
-            isWaiting = true;
-            StartCoroutine(Attack());
+            Debug.LogError("[ScytheScript] Player 物体上未找到 PlayerControl 脚本！");
+        }
+
+        var actions = InputManager.Instance.PlayerInputActions;
+
+        attackCallback = ctx =>
+        {
+            if (playerControl.isBlack && !isWaiting)
+            {
+                isWaiting = true;
+                StartCoroutine(Attack());
+            }
         };
+        
+        actions.Player.Attack.performed += attackCallback;
     }
 
     private IEnumerator Attack()
     {
-        // 这里放镰刀攻击动画效果
-        yield return new WaitForSeconds(0.05f); // 攻击前摇
+        yield return new WaitForSeconds(0.05f);
         if (Blade != null) Blade.SetActive(true);
-        yield return new WaitForSeconds(0.1f); // 刀锋碰撞箱显示
+        yield return new WaitForSeconds(0.1f);
         if (Blade != null) Blade.SetActive(false);
-        yield return new WaitForSeconds(0.2f); // 攻击后摇
+        yield return new WaitForSeconds(0.2f);
         isWaiting = false;
     }
 
@@ -44,7 +57,7 @@ public class ScytheScript : MonoBehaviour
         float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         float currentAngle = transform.rotation.eulerAngles.z;
         float maxDelta = rotationSpeed * Time.deltaTime;
-        float delta = Mathf.DeltaAngle(currentAngle, targetAngle); // 最短角度差（-180..180）
+        float delta = Mathf.DeltaAngle(currentAngle, targetAngle);
         float clamped = Mathf.Clamp(delta, -maxDelta, maxDelta);
         float newAngle = currentAngle + clamped;
         transform.rotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
@@ -52,16 +65,10 @@ public class ScytheScript : MonoBehaviour
 
     private void OnDisable()
     {
-        // 脚本禁用时注销事件
         var actions = InputManager.Instance?.PlayerInputActions;
-        if (actions != null)
+        if (actions != null && attackCallback != null)
         {
-            actions.Player.Attack.performed -= ctx =>
-            {
-                if (isWaiting) return;
-                isWaiting = true;
-                StartCoroutine(Attack());
-            };
+            actions.Player.Attack.performed -= attackCallback;
         }
     }
 }
