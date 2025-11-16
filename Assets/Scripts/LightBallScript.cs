@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class LightBallScript : MonoBehaviour
 {
@@ -8,25 +9,32 @@ public class LightBallScript : MonoBehaviour
     private float speed = 0f;
     private float timer = 0f;
     private Vector3 moveDir = Vector3.zero;
-    private Vector3 worldPos = Vector3.zero; // 保存鼠标世界坐标
-
+    private Vector3 worldPos = Vector3.zero;
+    private System.Action<InputAction.CallbackContext> mouseCallback; // 保存回调
 
     private void Start()
     {
-        var actions = InputManager.Instance.PlayerInputActions;
-        actions.Player.MousePosition.performed += ctx =>
+        var actions = InputManager.Instance?.PlayerInputActions;
+        if (actions == null)
+        {
+            Debug.LogError("[LightBallScript] InputManager not initialized!");
+            return;
+        }
+
+        // 创建并保存回调
+        mouseCallback = ctx =>
         {
             Vector2 mouseScreenPos = ctx.ReadValue<Vector2>();
-            // 更新 worldPos 字段（每次鼠标移动时调用）
             worldPos = Camera.main.ScreenToWorldPoint(
                 new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0f)
             );
         };
+
+        actions.Player.MousePosition.performed += mouseCallback;
     }
 
     private void Update()
     {
-        // 每帧都计算 launchDir，指向当前鼠标位置
         launchDir = (worldPos - transform.position).normalized;
         
         timer += Time.deltaTime;
@@ -40,23 +48,30 @@ public class LightBallScript : MonoBehaviour
         
         if (timer >= 5f)
         {
-            gameObject.SetActive(false);
+            UnsubscribeAndDestroy();
         }
+    }
+
+    private void UnsubscribeAndDestroy()
+    {
+        // 注销事件
+        var actions = InputManager.Instance?.PlayerInputActions;
+        if (actions != null && mouseCallback != null)
+        {
+            actions.Player.MousePosition.performed -= mouseCallback;
+        }
+        
+        // 销毁物体
+        Destroy(gameObject);
     }
 
     private void OnDisable()
     {
-        // 脚本禁用时注销事件
+        // 备用清理：如果物体被其他方式禁用
         var actions = InputManager.Instance?.PlayerInputActions;
-        if (actions != null)
+        if (actions != null && mouseCallback != null)
         {
-            actions.Player.MousePosition.performed -= ctx =>
-            {
-                Vector2 mouseScreenPos = ctx.ReadValue<Vector2>();
-                worldPos = Camera.main.ScreenToWorldPoint(
-                    new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0f)
-                );
-            };
+            actions.Player.MousePosition.performed -= mouseCallback;
         }
     }
 }
