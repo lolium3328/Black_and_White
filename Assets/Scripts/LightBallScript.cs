@@ -11,7 +11,7 @@ public class LightBallScript : MonoBehaviour
     private Vector3 worldPos = Vector3.zero; // 保存鼠标世界坐标
 
 
-    private void Awake()
+    private void Start()
     {
         var actions = InputManager.Instance.PlayerInputActions;
         actions.Player.MousePosition.performed += ctx =>

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AimPointScript : MonoBehaviour
 {
-    private void Awake()
+    private void Start()
     {
         // 使用全局 InputManager 实例
         var actions = InputManager.Instance.PlayerInputActions;

@@ -11,7 +11,7 @@ public class LightBallSpawnerScript : MonoBehaviour
     [SerializeField] float widthOffset = 0.5f; //生成光球的范围偏移量
     private bool isAttacking = false;
 
-    private void Awake()
+    private void Start()
     {
         var actions = InputManager.Instance.PlayerInputActions;
         actions.Player.Attack.performed += ctx =>

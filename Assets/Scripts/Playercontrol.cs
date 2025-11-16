@@ -31,10 +31,7 @@ public class PlayerControl : MonoBehaviour
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         BlackOutlook.SetActive(true);
         WhiteOutlook.SetActive(false);
-    }
 
-    private void Awake()
-    {
         // 使用全局 InputManager 实例
         var actions = InputManager.Instance.PlayerInputActions;
 

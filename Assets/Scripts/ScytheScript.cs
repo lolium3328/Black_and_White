@@ -12,7 +12,7 @@ public class ScytheScript : MonoBehaviour
     private System.Action<InputAction.CallbackContext> attackCallback;
     private PlayerControl playerControl; // 改为局部字段
 
-    private void Awake()
+    private void Start()
     {
         // 从 Player 物体上获取 PlayerControl 脚本
         playerControl = Player?.GetComponent<PlayerControl>();
